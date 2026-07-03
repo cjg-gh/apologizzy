@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Apology</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-dark: #0d0d0d; --bg-card: #1a1a1a; --text-primary: #e8e8e8;
+            --text-secondary: #a0a0a0; --text-muted: #666666; --border: #2a2a2a;
+            --border-hover: #404040; --accent: #888888; --shadow: rgba(0,0,0,0.6);
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-dark); color: var(--text-primary);
+            min-height: 100vh; overflow-x: hidden;
+        }
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; height: 70px;
+            background: rgba(13,13,13,0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000; padding: 0 20px;
+        }
+        .nav-links { display: flex; gap: 0; list-style: none; }
+        .nav-links li { position: relative; }
+        .nav-links a {
+            display: block; padding: 24px 30px; color: var(--text-secondary);
+            text-decoration: none; font-size: 0.95rem; letter-spacing: 2px;
+            text-transform: uppercase; transition: all 0.3s ease;
+            cursor: pointer; border: none; background: none; font-family: inherit;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--text-primary); }
+        .nav-links a::after {
+            content: ''; position: absolute; bottom: 0; left: 50%;
+            width: 0; height: 2px; background: var(--text-primary);
+            transition: all 0.3s ease; transform: translateX(-50%);
+        }
+        .nav-links a:hover::after, .nav-links a.active::after { width: 60%; }
+        .section {
+            display: none; padding: 100px 20px 60px;
+            min-height: 100vh; max-width: 1200px; margin: 0 auto;
+            animation: fadeIn 0.5s ease-out;
+        }
+        .section.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .home-hero { text-align: center; padding: 80px 20px; }
+        .home-hero h1 { font-size: 3.5rem; font-weight: 200; letter-spacing: 8px; margin-bottom: 20px; }
+        .home-hero .subtitle { font-size: 1.1rem; color: var(--text-secondary); letter-spacing: 3px; margin-bottom: 50px; }
+        .home-content { max-width: 700px; margin: 0 auto; text-align: center; }
+        .home-content p { font-size: 1.15rem; line-height: 2; color: var(--text-secondary); margin-bottom: 25px; }
+        .home-divider { width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); margin: 40px auto; }
+        .home-quote { font-style: italic; font-size: 1.3rem; color: var(--text-muted); letter-spacing: 1px; margin-top: 50px; }
+                .boxes-header { text-align: center; margin-bottom: 50px; }
+        .boxes-header h2 { font-size: 2.2rem; font-weight: 300; letter-spacing: 6px; margin-bottom: 15px; }
+        .boxes-header p { color: var(--text-muted); letter-spacing: 2px; font-size: 0.95rem; }
+        .box-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .nav-arrow {
+            width: 50px; height: 50px;
+            border: 2px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            font-family: 'Courier New', monospace;
+        }
+        .nav-arrow:hover:not(:disabled) {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+        .nav-arrow:disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+        }
+        .card-scene {
+            width: 380px;
+            height: 480px;
+            perspective: 1200px;
+            cursor: pointer;
+        }
+        .card {
+            width: 100%; height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .card-face {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            padding: 40px;
+            box-shadow: 0 20px 40px -10px var(--shadow), 0 0 0 1px var(--border);
+            transition: box-shadow 0.3s ease;
+            background: linear-gradient(145deg, #1f1f1f, #161616);
+        }
+        .card-scene:hover .card-face {
+            box-shadow: 0 25px 50px -10px var(--shadow), 0 0 0 1px var(--border-hover);
+        }
+        .box-title {
+            font-size: 1.6rem; font-weight: 400;
+            letter-spacing: 4px; margin-bottom: 20px;
+            text-transform: uppercase; color: var(--text-primary);
+        }
+        .box-preview {
+            font-size: 1.05rem; line-height: 1.8;
+            color: var(--text-secondary); text-align: center;
+        }
+        .tap-hint {
+            position: absolute; bottom: 18px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem; color: var(--text-muted);
+            letter-spacing: 1px; opacity: 0.7;
+        }
+        .card-number {
+            position: absolute; bottom: 18px; right: 22px;
+            font-size: 0.8rem; color: var(--text-muted);
+            font-weight: 600; letter-spacing: 2px;
+        }
+                .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(10px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; opacity: 0; visibility: hidden; transition: all 0.4s ease;
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-content {
+            background: linear-gradient(145deg, #1a1a1a, #141414);
+            border: 1px solid var(--border); border-radius: 20px;
+            padding: 50px; max-width: 500px; width: 90%;
+            text-align: center;
+            transform: scale(0.8) translateY(30px);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.8);
+        }
+        .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+        .modal-close {
+            position: absolute; top: 20px; right: 25px;
+            background: none; border: none; color: var(--text-muted);
+            font-size: 1.8rem; cursor: pointer; transition: color 0.3s;
+            width: 40px; height: 40px; display: flex;
+            align-items: center; justify-content: center; border-radius: 50%;
+        }
+        .modal-close:hover { color: var(--text-primary); background: rgba(255,255,255,0.05); }
+        .modal-title {
+            font-size: 1.5rem; font-weight: 400;
+            letter-spacing: 4px; margin-bottom: 25px; text-transform: uppercase;
+        }
+        .modal-text {
+            font-size: 1.1rem; line-height: 2;
+            color: var(--text-secondary); margin-bottom: 20px;
+        }
+        .modal-divider {
+            width: 50px; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            margin: 25px auto;
+        }
+        .modal-subtext {
+            font-size: 0.95rem; color: var(--text-muted); line-height: 1.8;
+        }
+        .about-header { text-align: center; margin-bottom: 60px; }
+        .about-header h2 { font-size: 2.2rem; font-weight: 300; letter-spacing: 6px; margin-bottom: 15px; }
+        .about-header p { color: var(--text-muted); letter-spacing: 2px; }
+        .about-content { max-width: 700px; margin: 0 auto; }
+        .about-card {
+            background: linear-gradient(145deg, #1a1a1a, #141414);
+            border: 1px solid var(--border); border-radius: 16px;
+            padding: 40px; margin-bottom: 30px;
+            box-shadow: 0 10px 30px -10px var(--shadow);
+            transition: all 0.3s ease;
+        }
+        .about-card:hover { border-color: var(--border-hover); transform: translateY(-3px); }
+        .about-card h3 { font-size: 1.2rem; font-weight: 400; letter-spacing: 3px; margin-bottom: 20px; text-transform: uppercase; }
+        .about-card p { font-size: 1rem; line-height: 2; color: var(--text-secondary); }
+        .particle { position: fixed; width: 3px; height: 3px; background: rgba(255,255,255,0.08); border-radius: 50%; pointer-events: none; animation: float 20s infinite; z-index: 0; }
+        @keyframes float { 0%,100% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; } }
+        @media (max-width: 768px) {
+            .navbar { height: 60px; }
+            .nav-links a { padding: 20px 15px; font-size: 0.8rem; letter-spacing: 1px; }
+            .home-hero h1 { font-size: 2.2rem; letter-spacing: 4px; }
+            .card-scene { width: 280px; height: 400px; }
+            .box-wrapper { gap: 15px; }
+            .nav-arrow { width: 40px; height: 40px; font-size: 1rem; }
+            .section { padding-top: 80px; }
+            .modal-content { padding: 35px 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particle" style="left:5%;animation-delay:0s"></div>
+    <div class="particle" style="left:15%;animation-delay:4s"></div>
+    <div class="particle" style="left:25%;animation-delay:8s"></div>
+    <div class="particle" style="left:35%;animation-delay:2s"></div>
+    <div class="particle" style="left:45%;animation-delay:12s"></div>
+    <div class="particle" style="left:55%;animation-delay:6s"></div>
+    <div class="particle" style="left:65%;animation-delay:10s"></div>
+    <div class="particle" style="left:75%;animation-delay:3s"></div>
+    <div class="particle" style="left:85%;animation-delay:14s"></div>
+    <div class="particle" style="left:95%;animation-delay:7s"></div>
+
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-section="home">Home</a></li>
+            <li><a href="#" class="nav-link" data-section="boxes">Boxes</a></li>
+            <li><a href="#" class="nav-link" data-section="about">About</a></li>
+        </ul>
+    </nav>
+
+    <section class="section active" id="home">
+        <div class="home-hero">
+            <h1>My Apologies</h1>
+            <p class="subtitle">From the bottom of my heart</p>
+        </div>
+        <div class="home-content">
+            <p>I know words can only do so much, but I hope these few boxes can convey how truly sorry I am for everything that happened last night.</p>
+            <div class="home-divider"></div>
+            <p>Every moment without your forgiveness felt heavier than that's why I kept asking for kisses. That is why I hate getting angy with <em>you</em>.</p>
+            <div class="home-divider"></div>
+            <p>I have put together these boxes — each one holding a piece of what I want to say. Tap on them when you're readdy</p>
+            <p class="home-quote">"Forgiveness does not change the past, but it does enlarge the future."</p>
+        </div>
+    </section>
+
+    <section class="section" id="boxes">
+        <div class="boxes-header">
+            <h2>I'm Sorry</h2>
+            <p>Tap the box to read more, or use the arrows to navigate</p>
+        </div>
+        <div class="box-wrapper">
+            <button class="nav-arrow" id="prevBtn" onclick="prevBox()" disabled>&lt;</button>
+            <div class="card-scene" id="cardScene" onclick="openModal()">
+                <div class="card" id="theCard">
+                    <div class="card-face card-front">
+                        <div class="box-title" id="boxTitle">I Know</div>
+                        <div class="box-preview" id="boxPreview">
+                            I messed up.<br>My words were careless,<br>and I hurt you. 
+                        </div>
+                        <div class="tap-hint">tap to open</div>
+                        <div class="card-number" id="boxNumber">01 / 05</div>
+                    </div>
+                </div>
+            </div>
+            <button class="nav-arrow" id="nextBtn" onclick="nextBox()">&gt;</button>
+        </div>
+    </section>
+        <section class="section" id="about">
+        <div class="about-header">
+            <h2>About</h2>
+            <p>A little more about this page</p>
+        </div>
+        <div class="about-content">
+            <div class="about-card">
+                <h3>Why This Exists</h3>
+                <p>Sometimes a simple "I am sorry" is not enough. This page was built as a quiet, a way to express regret and ask for your forgiveness. I am kinda sleepy so hope you do not mind the grammar and stuff.</p>
+            </div>
+            <div class="about-card">
+                <h3>What I Hope For</h3>
+                <p>I do not expect you to forgive me  instantly, like I already know you. You do not forgive easy. All I ask is a chance to show you that I have learned, that I care, and that I am willing wait and to do whatever it takes to have you give me kisses again.</p>
+            </div>
+            <div class="about-card">
+                <h3>Talk to me</h3>
+                <p>If you ever feel like talking, even just to yell at me, I am here. I will always be here. I love you baby.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal-overlay" id="modal" onclick="closeModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div class="modal-title" id="modalTitle">I Know</div>
+            <div class="modal-text" id="modalText">...</div>
+            <div class="modal-divider"></div>
+            <div class="modal-subtext" id="modalSubtext">...</div>
+        </div>
+    </div>
+
+    <script>
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', e => {
+                e.preventDefault();
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(link.dataset.section).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        const boxes = [
+            {
+                title: 'I Know',
+                preview: 'I messed up.<br>My words were careless,<br>and I hurt you.',
+                text: 'I know I messed up. My words were careless, and I made you irritated at me in ways I never intended to. Like, I wanna have an us moment. But there is no excuse for what I did, and I take full responsibility for the mess I caused.',
+                subtext: 'I hope you can give me your sweet kisses baby.'
+            },
+            {
+                title: 'You Mean',
+                preview: 'Everything to me.<br>The thought of losing you<br>terrifies me.',
+                text: 'You mean everything to me. The thought of you not giving me kisses anymorr terrifies me more than anything else. I am quite addicted to it.',
+                subtext: 'I promise to do better, to be more understanding and to care more.'
+            },
+            {
+                title: 'I Promise',
+                preview: 'To do better.<br>To listen more.<br>To care more.',
+                text: 'I promise to grow from this. I will work on myself, on my patience, on my words, and on being the person you deserve. This is not just empty talk — I mean it. I am even willing to shave my moustache for you. ',
+                subtext: 'Actions speaks louder than words, and I am ready to prove that thrrough everything I do from now on.'
+            },
+            {
+                title: 'I Will Wait',
+                preview: 'As long as it takes.<br>No pressure, no rush.<br>Just patience.',
+                text: 'I will wait as long as it takes. No pressure, no rush, no expectations. You deserve all the time you need to be irritated to me, to think, and to decide what is best for you, whether you forgive me or not for my foolish actions, like getting mad hihi',
+                subtext: 'I will be right here whenever you are ready - today, tomorrow, or whenever your heart feels lighter and so that I could feel your warmth through the screen again.'
+            },
+            {
+                title: 'Forgive Me',
+                preview: 'I am truly, deeply sorry.<br>Please give me a chance<br>to make things right.',
+                text: 'I am truly, deeply sorry. Please give me a chance to make things right. I understand if forgiveness does not come easy, but I hope one day it will, or the next day.(Next day is tomorrow.)',
+                subtext: 'You are worth every effort, every apology, and every moment of patience. I will never stop trying and you know tjat. It is your boyfriend CJ after all.'
+            }
+        ];
+        
+                let currentBox = 0;
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const boxTitle = document.getElementById('boxTitle');
+        const boxPreview = document.getElementById('boxPreview');
+        const boxNumber = document.getElementById('boxNumber');
+        const theCard = document.getElementById('theCard');
+
+        function updateBox() {
+            const b = boxes[currentBox];
+            theCard.style.transform = 'rotateY(90deg)';
+            setTimeout(() => {
+                boxTitle.textContent = b.title;
+                boxPreview.innerHTML = b.preview;
+                boxNumber.textContent = String(currentBox + 1).padStart(2, '0') + ' / 05';
+                theCard.style.transform = 'rotateY(0deg)';
+            }, 200);
+            prevBtn.disabled = currentBox === 0;
+            nextBtn.disabled = currentBox === boxes.length - 1;
+        }
+
+        function nextBox() {
+            if (currentBox < boxes.length - 1) {
+                currentBox++;
+                updateBox();
+            }
+        }
+
+        function prevBox() {
+            if (currentBox > 0) {
+                currentBox--;
+                updateBox();
+            }
+        }
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalText = document.getElementById('modalText');
+        const modalSubtext = document.getElementById('modalSubtext');
+
+        function openModal() {
+            const b = boxes[currentBox];
+            modalTitle.textContent = b.title;
+            modalText.textContent = b.text;
+            modalSubtext.textContent = b.subtext;
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(e) {
+            if (e && e.target !== modal && !e.target.classList.contains('modal-close')) return;
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+            if (e.key === 'ArrowRight') nextBox();
+            if (e.key === 'ArrowLeft') prevBox();
+        });
+
+        const cardScene = document.getElementById('cardScene');
+        cardScene.addEventListener('mousemove', e => {
+            const r = cardScene.getBoundingClientRect();
+            theCard.style.transform = `perspective(1000px) rotateX(${(e.clientY - r.top - r.height/2)/20}deg) rotateY(${(r.width/2 - e.clientX + r.left)/20}deg)`;
+        });
+        cardScene.addEventListener('mouseleave', () => {
+            theCard.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+        });
+    </script>
+</body>
+</html>
